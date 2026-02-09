@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Eternal Love - 社交应用</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -26,36 +26,40 @@
         }
 
         body {
-            background-color: #F5F7FA;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  color: #333;
+  /* 去掉 flex 居中，让手机容器直接铺满 */
+  min-height: 100vh;
+}
 
         /* 手机容器 */
         .phone-container {
-            width: 360px;
-            height: 700px;
-            background-color: #fff;
-            border-radius: 40px;
-            box-shadow: var(--shadow), 0 0 0 10px #222, 0 20px 40px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
+  width: 100vw;      /* 宽度 = 视口宽度 */
+  height: 100vh;     /* 高度 = 视口高度 */
+  background-color: #fff;
+  border-radius: 0;  /* 去掉圆角，全屏显示 */
+  box-shadow: none;  /* 去掉阴影，更像真实手机 */
+  overflow: hidden;
+  position: fixed;   /* 固定在屏幕上，不会滚动 */
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;     /* 确保在最上层 */
+}
 
         /* 状态栏 */
         .status-bar {
-            height: 30px;
+            height: auto;
+min-height: 30px;
             background-color: var(--dark-color);
             color: white;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            padding: 8px 20px;
+            padding-top: env(safe-area-inset-top);
             padding: 0 20px;
             font-size: 14px;
             z-index: 100;
@@ -181,10 +185,11 @@
 
         /* 应用内容区 */
         .app-content {
-            flex: 1;
-            overflow-y: auto;
-            background-color: #f8f9fa;
-        }
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  padding-bottom: env(safe-area-inset-bottom); /* 适配底部手势条 */
+}
 
         /* Eternal Love 应用样式 */
         .el-tabs {
