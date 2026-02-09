@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Love - 社交应用</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary-color: #FF6B9D;
+            --secondary-color: #7C4DFF;
+            --dark-color: #1A1A2E;
+            --light-color: #F8F9FA;
+            --gray-color: #6C757D;
+            --success-color: #28A745;
+            --border-radius: 20px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #F5F7FA;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 手机容器 */
+        .phone-container {
+            width: 360px;
+            height: 700px;
+            background-color: #fff;
+            border-radius: 40px;
+            box-shadow: var(--shadow), 0 0 0 10px #222, 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            height: 30px;
+            background-color: var(--dark-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            z-index: 100;
+            position: relative;
+        }
+
+        .time {
+            font-weight: 600;
+        }
+
+        .weather {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 主屏幕 */
+        .home-screen {
+            flex: 1;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 20px;
+            align-content: start;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .app-icon:hover {
+            transform: translateY(-5px);
+        }
+
+        .app-icon i {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .app-icon span {
+            font-size: 12px;
+            color: var(--dark-color);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* 壁纸设置提示 */
+        .wallpaper-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray-color);
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            margin: 0 20px;
+        }
+
+        /* 应用页面容器 */
+        .app-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            border-radius: 40px;
+            overflow: hidden;
+        }
+
+        /* 应用头部 */
+        .app-header {
+            height: 60px;
+            background-color: var(--dark-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .app-menu {
+            margin-left: auto;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* 应用内容区 */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+
+        /* Eternal Love 应用样式 */
+        .el-tabs {
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .el-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--gray-color);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .el-tab.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .el-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* 聊天列表 */
+        .chat-list {
+            padding: 15px;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7C4DFF, #FF6B9D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-right: 15px;
+            position: relative;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: var(--gray-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .favor-badge {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* 聊天界面 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message-user {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-ai {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: var(--gray-color);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message-withdrawn {
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .chat-action-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-action-btn:hover {
+            background-color: #ff4d87;
+        }
+
+        /* 商店样式 */
+        .store-categories {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            overflow-x: auto;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .store-category {
+            padding: 8px 15px;
+            background-color: #f1f1f1;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .store-category.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .store-products {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 120px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--primary-color);
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            font-size: 12px;
+            color: var(--gray-color);
+            line-height: 1.4;
+        }
+
+        /* 发现页面 */
+        .discover-content {
+            padding: 15px;
+        }
+
+        .moment {
+            background-color: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .moment-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .moment-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7C4DFF, #FF6B9D);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .moment-info {
+            flex: 1;
+        }
+
+        .moment-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .moment-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .moment-content {
+            padding: 0 15px 15px;
+        }
+
+        .moment-text {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .moment-actions {
+            display: flex;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+
+        .moment-action {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .moment-action i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+
+        .find-friends {
+            margin-top: 20px;
+        }
+
+        .ai-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ai-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7C4DFF, #FF6B9D);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .ai-info {
+            flex: 1;
+        }
+
+        .ai-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .ai-desc {
+            font-size: 13px;
+            color: var(--gray-color);
+            margin-bottom: 8px;
+        }
+
+        .ai-action-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ai-action-btn:hover {
+            background-color: #ff4d87;
+        }
+
+        /* 个人页面 */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 30px 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: white;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--primary-color);
+            border: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .profile-name {
+            font-size: 22px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .profile-id {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .profile-menu {
+            padding: 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            transform: translateX(5px);
+            background-color: #f8f9fa;
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: rgba(124, 77, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--secondary-color);
+            font-size: 18px;
+        }
+
+        .menu-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .menu-arrow {
+            color: var(--gray-color);
+        }
+
+        /* 相册和相机页面 */
+        .photo-grid {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--gray-color);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-view {
+            flex: 1;
+            background-color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .camera-preview {
+            width: 100%;
+            height: 400px;
+            background-color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 30px;
+        }
+
+        .camera-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: white;
+            border: 5px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: var(--dark-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .camera-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* 短信页面 */
+        .sms-list {
+            padding: 15px;
+        }
+
+        .sms-input-area {
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            display: flex;
+        }
+
+        .sms-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            margin-right: 10px;
+        }
+
+        .sms-send-btn {
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* 模态框 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+
+        .modal-btn.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background-color: #f1f1f1;
+            color: var(--dark-color);
+        }
+
+        /* 表单元素 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: white;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: var(--gray-color);
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 3px;
+        }
+
+        .nav-text {
+            font-size: 12px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 400px) {
+            .phone-container {
+                width: 320px;
+                height: 620px;
+            }
+            
+            .app-icon i {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 工具类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 手机容器 -->
+    <div class="phone-container">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="time" id="current-time">下午 3:30</div>
+            <div class="weather">
+                <i class="fas fa-sun"></i>
+                <span id="current-weather">天津 · 晴</span>
+            </div>
+        </div>
+
+        <!-- 主屏幕 -->
+        <div class="home-screen" id="home-screen">
+            <!-- 应用图标 -->
+            <div class="app-icon" data-app="eternal-love">
+                <i class="fas fa-heart"></i>
+                <span>Eternal Love</span>
+            </div>
+            
+            <div class="app-icon" data-app="store">
+                <i class="fas fa-store"></i>
+                <span>商店</span>
+            </div>
+            
+            <div class="app-icon" data-app="album">
+                <i class="fas fa-images"></i>
+                <span>相册</span>
+            </div>
+            
+            <div class="app-icon" data-app="camera">
+                <i class="fas fa-camera"></i>
+                <span>相机</span>
+            </div>
+            
+            <div class="app-icon" data-app="sms">
+                <i class="fas fa-comment-alt"></i>
+                <span>短信</span>
+            </div>
+            
+            <div class="app-icon" data-app="wallpaper">
+                <i class="fas fa-palette"></i>
+                <span>壁纸设置</span>
+            </div>
+            
+            <!-- 壁纸提示 -->
+            <div class="wallpaper-hint">
+                <i class="fas fa-long-arrow-alt-down"></i> 长按空白区域更换壁纸
+            </div>
+        </div>
+
+        <!-- Eternal Love 应用 -->
+        <div class="app-container" id="eternal-love-app">
+            <div class="app-header">
+                <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+                <div class="app-title">Eternal Love</div>
+                <div class="app-menu" id="el-menu">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="el-tabs">
+                <div class="el-tab active" data-tab="chat">聊天</div>
+                <div class="el-tab" data-tab="discover">发现</div>
+                <div class="el-tab" data-tab="profile">我</div>
+                <div class="el-tab" data-tab="create-ai">+</div>
+            </div>
+            
+            <div class="app-content">
+                <!-- 聊天列表 -->
+                <div class="tab-content active" id="chat-tab">
+                    <div class="chat-list">
+                        <!-- 聊天项将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 发现页面 -->
+                <div class="tab-content" id="discover-tab">
+                    <div class="discover-content">
+                        <!-- 朋友圈 -->
+                        <div class="moment">
+                            <div class="moment-header">
+                                <div class="moment-avatar">星</div>
+                                <div class="moment-info">
+                                    <div class="moment-name">星野</div>
+                                    <div class="moment-time">今天 14:30</div>
+                                </div>
+                            </div>
+                            <div class="moment-content">
+                                <div class="moment-text">今天天气真好，适合出去散步～</div>
+                            </div>
+                            <div class="moment-actions">
+                                <div class="moment-action">
+                                    <i class="far fa-heart"></i> <span>12</span>
+                                </div>
+                                <div class="moment-action">
+                                    <i class="far fa-comment"></i> <span>3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 寻找新朋友 -->
+                        <div class="find-friends">
+                            <h3 style="margin-bottom: 15px; color: var(--dark-color);">寻找新朋友</h3>
+                            
+                            <div class="ai-card">
+                                <div class="ai-avatar">月</div>
+                                <div class="ai-info">
+                                    <div class="ai-name">月见</div>
+                                    <div class="ai-desc">喜欢读书和写诗的AI，擅长创作浪漫的文字</div>
+                                    <button class="ai-action-btn">打招呼</button>
+                                </div>
+                            </div>
+                            
+                            <div class="ai-card">
+                                <div class="ai-avatar">风</div>
+                                <div class="ai-info">
+                                    <div class="ai-name">风语者</div>
+                                    <div class="ai-desc">热爱旅行和冒险，可以和你分享世界各地的故事</div>
+                                    <button class="ai-action-btn">打招呼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 个人页面 -->
+                <div class="tab-content" id="profile-tab">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-name">用户</div>
+                        <div class="profile-id">ID: EL2024_7X9T</div>
+                        
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">好友</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">1,245</div>
+                                <div class="stat-label">爱心币</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">成就</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-menu">
+                        <div class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="menu-text">钱包</div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="menu-text">成就</div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="menu-text">设置</div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 创建AI页面 -->
+                <div class="tab-content" id="create-ai-tab">
+                    <div style="padding: 20px;">
+                        <h3 style="margin-bottom: 20px; color: var(--dark-color);">创建新AI角色</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">头像</label>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div class="ai-avatar" style="margin: 0; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: var(--dark-color);">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <button class="ai-action-btn">从相册选择</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-input" placeholder="为你的AI起一个名字">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">性别</label>
+                            <select class="form-select">
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">对外设定（公开描述）</label>
+                            <textarea class="form-textarea" placeholder="其他用户可以看到的AI描述"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">隐藏设定（私密描述）</label>
+                            <textarea class="form-textarea" placeholder="只有你才知道的AI隐藏设定"></textarea>
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                            <label class="form-label" style="margin: 0;">是否公开此AI</label>
+                            <div style="position: relative; width: 50px;">
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="public-toggle" checked>
+                                    <label for="public-toggle" class="toggle-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px;">
+                            <button class="ai-action-btn" style="width: 100%; padding: 15px; font-size: 16px;">创建AI</button>
+                        </div>
+                        
+                        <div style="margin-top: 15px; text-align: center; font-size: 12px; color: var(--gray-color);">
+                            本周还可创建：<span style="color: var(--primary-color); font-weight: 600;">5</span> 个AI
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商店应用 -->
+        <div class="app-container" id="store-app">
+            <div class="app-header">
+                <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+                <div class="app-title">商店</div>
+            </div>
+            
+            <div class="app-content">
+                <!-- 商品分类 -->
+                <div class="store-categories">
+                    <div class="store-category active">全部</div>
+                    <div class="store-category">食品</div>
+                    <div class="store-category">饰品</div>
+                    <div class="store-category">百货</div>
+                    <div class="store-category">鞋包</div>
+                    <div class="store-category">水果</div>
+                    <div class="store-category">女装</div>
+                    <div class="store-category">男装</div>
+                </div>
+                
+                <!-- 商品列表 -->
+                <div class="store-products">
+                    <!-- 商品将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 相册应用 -->
+        <div class="app-container" id="album-app">
+            <div class="app-header">
+                <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+                <div class="app-title">相册</div>
+            </div>
+            
+            <div class="app-content">
+                <div class="photo-grid">
+                    <div class="photo-item">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="photo-item">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div class="photo-item">
+                        <i class="fas fa-cat"></i>
+                    </div>
+                    <div class="photo-item">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <div class="photo-item">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="photo-item">
+                        <i class="fas fa-music"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 相机应用 -->
+        <div class="app-container" id="camera-app">
+            <div class="app-header">
+                <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+                <div class="app-title">相机</div>
+            </div>
+            
+            <div class="camera-view">
+                <div class="camera-preview">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <div class="camera-btn">
+                    <i class="fas fa-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 短信应用 -->
+        <div class="app-container" id="sms-app">
+            <div class="app-header">
+                <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+                <div class="app-title">短信</div>
+            </div>
+            
+            <div class="app-content">
+                <div class="chat-list">
+                    <!-- 短信对话将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="sms-input-area">
+                <input type="text" class="sms-input" placeholder="输入短信内容...">
+                <button class="sms-send-btn">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 聊天对话框 -->
+    <div class="app-container" id="chat-detail">
+        <div class="app-header">
+            <button class="back-btn" data-back><i class="fas fa-arrow-left"></i></button>
+            <div class="app-title">星野</div>
+            <div class="app-menu" id="chat-menu">
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- 消息将通过JS动态生成 -->
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" placeholder="输入消息..." id="chat-input">
+                <button class="chat-action-btn" id="send-gift">
+                    <i class="fas fa-gift"></i>
+                </button>
+                <button class="chat-action-btn" id="send-image">
+                    <i class="fas fa-image"></i>
+                </button>
+                <button class="chat-action-btn" id="send-message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 礼物选择模态框 -->
+    <div class="modal" id="gift-modal">
+        <div class="modal-content">
+            <div class="modal-header">选择礼物</div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px; color: var(--gray-color);">
+                    <i class="fas fa-gift" style="font-size: 40px; margin-bottom: 15px; color: var(--primary-color);"></i>
+                    <p>从背包中选择礼物赠送给AI</p>
+                    <div style="margin-top: 20px;">
+                        <div class="product-card" style="max-width: 200px; margin: 0 auto;">
+                            <div class="product-image">
+                                <i class="fas fa-stroopwafel"></i>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">甜甜圈</div>
+                                <div class="product-description">赠送后+5好感度</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="close-gift">取消</button>
+                <button class="modal-btn primary" id="send-gift-btn">赠送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI菜单模态框 -->
+    <div class="modal" id="ai-menu-modal">
+        <div class="modal-content">
+            <div class="modal-header">AI设置</div>
+            <div class="modal-body">
+                <div style="padding: 10px 0;">
+                    <div class="menu-item" style="margin-bottom: 0;" id="api-option">
+                        <div class="menu-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div class="menu-text">接入外部API</div>
+                    </div>
+                    
+                    <div class="menu-item" style="margin-bottom: 0;" id="block-option">
+                        <div class="menu-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="menu-text">拉黑</div>
+                    </div>
+                    
+                    <div class="menu-item" style="margin-bottom: 0;" id="delete-option">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <div class="menu-text">删除好友</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="close-menu">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 壁纸选择模态框 -->
+    <div class="modal" id="wallpaper-modal">
+        <div class="modal-content">
+            <div class="modal-header">选择壁纸</div>
+            <div class="modal-body">
+                <div class="photo-grid">
+                    <div class="photo-item" data-wallpaper="gradient1" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);"></div>
+                    <div class="photo-item" data-wallpaper="gradient2" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+                    <div class="photo-item" data-wallpaper="gradient3" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);"></div>
+                    <div class="photo-item" data-wallpaper="gradient4" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);"></div>
+                    <div class="photo-item" data-wallpaper="gradient5" style="background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);"></div>
+                    <div class="photo-item" data-wallpaper="gradient6" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="close-wallpaper">取消</button>
+                <button class="modal-btn primary" id="save-wallpaper">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API设置模态框 -->
+    <div class="modal" id="api-modal">
+        <div class="modal-content">
+            <div class="modal-header">接入外部API</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">API密钥</label>
+                    <input type="text" class="form-input" placeholder="输入您的API密钥">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">自定义角色设定</label>
+                    <textarea class="form-textarea" placeholder="为AI设置自定义角色，此设定仅您可见"></textarea>
+                </div>
+                
+                <div style="padding: 10px; background-color: #f8f9fa; border-radius: 10px; font-size: 12px; color: var(--gray-color); margin-top: 20px;">
+                    <i class="fas fa-info-circle" style="margin-right: 5px;"></i> 
+                    此功能允许您接入外部AI API（如OpenAI、Claude等）。请妥善保管您的API密钥。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="close-api">取消</button>
+                <button class="modal-btn primary" id="save-api">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 应用数据
+        const appData = {
+            currentApp: null,
+            currentChat: null,
+            wallpapers: [
+                'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)',
+                'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)'
+            ],
+            currentWallpaper: 0,
+            weather: '天津 · 晴',
+            chats: [
+                {
+                    id: 1,
+                    name: '星野',
+                    avatar: '星',
+                    favor: 65,
+                    lastMessage: '今天天气真好，适合出去散步～',
+                    lastTime: '14:30',
+                    messages: [
+                        {sender: 'ai', text: '你好！我是星野，很高兴认识你！', time: '10:00'},
+                        {sender: 'user', text: '你好星野，我也很高兴认识你！', time: '10:05'},
+                        {sender: 'ai', text: '今天天气真好，适合出去散步～', time: '14:30'}
+                    ]
+                },
+                {
+                    id: 2,
+                    name: '月见',
+                    avatar: '月',
+                    favor: 42,
+                    lastMessage: '最近在读一本诗集，非常优美',
+                    lastTime: '昨天',
+                    messages: [
+                        {sender: 'ai', text: '你好，我是月见，喜欢读书和写诗', time: '昨天 09:20'},
+                        {sender: 'user', text: '我也喜欢诗歌，能分享一些吗？', time: '昨天 14:15'},
+                        {sender: 'ai', text: '最近在读一本诗集，非常优美', time: '昨天 16:40'}
+                    ]
+                },
+                {
+                    id: 3,
+                    name: '风语者',
+                    avatar: '风',
+                    favor: 28,
+                    lastMessage: '我刚从西藏旅行回来',
+                    lastTime: '周二',
+                    messages: [
+                        {sender: 'ai', text: '你好，我是风语者，热爱旅行和冒险', time: '周二 11:30'},
+                        {sender: 'user', text: '真羡慕，最近去了哪里？', time: '周二 13:45'},
+                        {sender: 'ai', text: '我刚从西藏旅行回来', time: '周二 15:20'}
+                    ]
+                }
+            ],
+            storeProducts: [
+                {id: 1, name: '甜甜圈', icon: 'stroopwafel', category: '食品', price: 50, description: '赠送后+5好感度'},
+                {id: 2, name: '草莓蛋糕', icon: 'birthday-cake', category: '食品', price: 120, description: '赠送后+10好感度'},
+                {id: 3, name: '手链', icon: 'gem', category: '饰品', price: 200, description: '赠送后+15好感度'},
+                {id: 4, name: '围巾', icon: 'scarf', category: '百货', price: 150, description: '赠送后+12好感度'},
+                {id: 5, name: '草莓', icon: 'apple-alt', category: '水果', price: 80, description: '赠送后+8好感度'},
+                {id: 6, name: '书', icon: 'book', category: '百货', price: 100, description: '赠送后+10好感度'},
+                {id: 7, name: '音乐盒', icon: 'music', category: '百货', price: 250, description: '赠送后+20好感度'},
+                {id: 8, name: '手袋', icon: 'shopping-bag', category: '鞋包', price: 300, description: '赠送后+25好感度'}
+            ],
+            smsContacts: [
+                {id: 1, name: 'AI助手', lastMessage: '您的每日任务已完成', lastTime: '今天'},
+                {id: 2, name: '系统通知', lastMessage: '新版本已发布', lastTime: '昨天'},
+                {id: 3, name: '客服', lastMessage: '感谢您的反馈', lastTime: '周一'}
+            ]
+        };
+
+        // DOM元素
+        const elements = {
+            // 主屏幕
+            homeScreen: document.getElementById('home-screen'),
+            
+            // 状态栏
+            currentTime: document.getElementById('current-time'),
+            currentWeather: document.getElementById('current-weather'),
+            
+            // 应用
+            eternalLoveApp: document.getElementById('eternal-love-app'),
+            storeApp: document.getElementById('store-app'),
+            albumApp: document.getElementById('album-app'),
+            cameraApp: document.getElementById('camera-app'),
+            smsApp: document.getElementById('sms-app'),
+            chatDetail: document.getElementById('chat-detail'),
+            
+            // 标签页
+            tabs: document.querySelectorAll('.el-tab'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            
+            // 聊天
+            chatList: document.querySelector('.chat-list'),
+            chatMessages: document.getElementById('chat-messages'),
+            chatInput: document.getElementById('chat-input'),
+            
+            // 商店
+            storeProductsContainer: document.querySelector('.store-products'),
+            storeCategories: document.querySelectorAll('.store-category'),
+            
+            // 模态框
+            giftModal: document.getElementById('gift-modal'),
+            aiMenuModal: document.getElementById('ai-menu-modal'),
+            wallpaperModal: document.getElementById('wallpaper-modal'),
+            apiModal: document.getElementById('api-modal'),
+            
+            // 按钮
+            backButtons: document.querySelectorAll('[data-back]'),
+            sendMessageBtn: document.getElementById('send-message'),
+            sendGiftBtn: document.getElementById('send-gift'),
+            sendImageBtn: document.getElementById('send-image'),
+            closeGiftBtn: document.getElementById('close-gift'),
+            sendGiftBtnModal: document.getElementById('send-gift-btn'),
+            closeMenuBtn: document.getElementById('close-menu'),
+            closeWallpaperBtn: document.getElementById('close-wallpaper'),
+            saveWallpaperBtn: document.getElementById('save-wallpaper'),
+            closeApiBtn: document.getElementById('close-api'),
+            saveApiBtn: document.getElementById('save-api'),
+            apiOption: document.getElementById('api-option'),
+            blockOption: document.getElementById('block-option'),
+            deleteOption: document.getElementById('delete-option'),
+            elMenu: document.getElementById('el-menu'),
+            chatMenu: document.getElementById('chat-menu'),
+            
+            // 应用图标
+            appIcons: document.querySelectorAll('.app-icon')
+        };
+
+        // 初始化函数
+        function init() {
+            // 更新时间
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // 渲染聊天列表
+            renderChatList();
+            
+            // 渲染商品列表
+            renderStoreProducts();
+            
+            // 渲染短信列表
+            renderSMSList();
+            
+            // 设置初始壁纸
+            elements.homeScreen.style.background = appData.wallpapers[appData.currentWallpaper];
+            
+            // 添加事件监听器
+            setupEventListeners();
+            
+            // 添加长按壁纸设置
+            setupLongPressWallpaper();
+        }
+
+        // 更新时间
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            
+            let period = '上午';
+            if (hours >= 12) {
+                period = '下午';
+                if (hours > 12) hours -= 12;
+            }
+            if (hours === 0) hours = 12;
+            
+            elements.currentTime.textContent = `${period} ${hours}:${minutes}`;
+        }
+
+        // 渲染聊天列表
+        function renderChatList() {
+            if (!elements.chatList) return;
+            
+            elements.chatList.innerHTML = '';
+            
+            appData.chats.forEach(chat => {
+                const favorClass = chat.favor > 50 ? 'favor-badge' : 'favor-badge';
+                const favorColor = chat.favor > 50 ? 'style="background-color: #FF6B9D;"' : 'style="background-color: #7C4DFF;"';
+                
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.dataset.chatId = chat.id;
+                chatItem.innerHTML = `
+                    <div class="chat-avatar">${chat.avatar}</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">${chat.name}</div>
+                            <div class="chat-time">${chat.lastTime}</div>
+                        </div>
+                        <div class="chat-preview">
+                            <span>${chat.lastMessage}</span>
+                            <div class="${favorClass}" ${favorColor}>${chat.favor}</div>
+                        </div>
+                    </div>
+                `;
+                
+                elements.chatList.appendChild(chatItem);
+                
+                // 添加点击事件
+                chatItem.addEventListener('click', () => {
+                    openChatDetail(chat.id);
+                });
+            });
+        }
+
+        // 渲染商品列表
+        function renderStoreProducts(filter = '全部') {
+            if (!elements.storeProductsContainer) return;
+            
+            elements.storeProductsContainer.innerHTML = '';
+            
+            let filteredProducts = appData.storeProducts;
+            if (filter !== '全部') {
+                filteredProducts = appData.storeProducts.filter(product => product.category === filter);
+            }
+            
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.dataset.productId = product.id;
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <i class="fas fa-${product.icon}"></i>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price} 爱心币</div>
+                        <div class="product-description">${product.description}</div>
+                    </div>
+                `;
+                
+                elements.storeProductsContainer.appendChild(productCard);
+                
+                // 添加点击事件
+                productCard.addEventListener('click', () => {
+                    alert(`购买了 ${product.name}，花费 ${product.price} 爱心币`);
+                });
+            });
+        }
+
+        // 渲染短信列表
+        function renderSMSList() {
+            const smsList = document.querySelector('#sms-app .chat-list');
+            if (!smsList) return;
+            
+            smsList.innerHTML = '';
+            
+            appData.smsContacts.forEach(contact => {
+                const smsItem = document.createElement('div');
+                smsItem.className = 'chat-item';
+                smsItem.innerHTML = `
+                    <div class="chat-avatar" style="background: linear-gradient(135deg, #4CAF50, #8BC34A);">${contact.name.charAt(0)}</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">${contact.name}</div>
+                            <div class="chat-time">${contact.lastTime}</div>
+                        </div>
+                        <div class="chat-preview">
+                            <span>${contact.lastMessage}</span>
+                        </div>
+                    </div>
+                `;
+                
+                smsList.appendChild(smsItem);
+            });
+        }
+
+        // 打开聊天详情
+        function openChatDetail(chatId) {
+            const chat = appData.chats.find(c => c.id === chatId);
+            if (!chat) return;
+            
+            appData.currentChat = chat;
+            
+            // 更新标题
+            document.querySelector('#chat-detail .app-title').textContent = chat.name;
+            
+            // 渲染消息
+            renderChatMessages(chat.messages);
+            
+            // 显示聊天详情，隐藏其他应用
+            showApp('chat-detail');
+        }
+
+        // 渲染聊天消息
+        function renderChatMessages(messages) {
+            if (!elements.chatMessages) return;
+            
+            elements.chatMessages.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${msg.sender}`;
+                messageDiv.innerHTML = `
+                    <div>${msg.text}</div>
+                    <div class="message-time">${msg.time}</div>
+                `;
+                
+                elements.chatMessages.appendChild(messageDiv);
+            });
+            
+            // 滚动到底部
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+        }
+
+        // 显示应用
+        function showApp(appId) {
+            // 隐藏所有应用
+            document.querySelectorAll('.app-container').forEach(app => {
+                app.style.display = 'none';
+            });
+            
+            // 隐藏主屏幕
+            elements.homeScreen.style.display = 'none';
+            
+            // 显示目标应用
+            const targetApp = document.getElementById(appId);
+            if (targetApp) {
+                targetApp.style.display = 'flex';
+                appData.currentApp = appId;
+                
+                // 添加淡入动画
+                targetApp.classList.add('fade-in');
+                setTimeout(() => {
+                    targetApp.classList.remove('fade-in');
+                }, 300);
+            }
+        }
+
+        // 返回主屏幕
+        function backToHome() {
+            // 隐藏所有应用
+            document.querySelectorAll('.app-container').forEach(app => {
+                app.style.display = 'none';
+            });
+            
+            // 显示主屏幕
+            elements.homeScreen.style.display = 'grid';
+            appData.currentApp = null;
+            appData.currentChat = null;
+        }
+
+        // 切换标签页
+        function switchTab(tabId) {
+            // 更新标签页样式
+            elements.tabs.forEach(tab => {
+                if (tab.dataset.tab === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // 显示对应的内容
+            elements.tabContents.forEach(content => {
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const messageText = elements.chatInput.value.trim();
+            if (!messageText || !appData.currentChat) return;
+            
+            // 添加到消息列表
+            const newMessage = {
+                sender: 'user',
+                text: messageText,
+                time: '刚刚'
+            };
+            
+            appData.currentChat.messages.push(newMessage);
+            appData.currentChat.lastMessage = messageText;
+            appData.currentChat.lastTime = '刚刚';
+            
+            // 更新UI
+            renderChatMessages(appData.currentChat.messages);
+            renderChatList();
+            
+            // 清空输入框
+            elements.chatInput.value = '';
+            
+            // AI回复
+            setTimeout(() => {
+                const aiResponses = [
+                    '谢谢你的消息！',
+                    '我明白了。',
+                    '这真有意思！',
+                    '我们可以多聊聊这个话题。',
+                    '你今天过得怎么样？'
+                ];
+                
+                const aiResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                
+                const aiMessage = {
+                    sender: 'ai',
+                    text: aiResponse,
+                    time: '刚刚'
+                };
+                
+                appData.currentChat.messages.push(aiMessage);
+                appData.currentChat.lastMessage = aiResponse;
+                
+                // 更新UI
+                renderChatMessages(appData.currentChat.messages);
+                renderChatList();
+            }, 1000);
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 应用图标点击事件
+            elements.appIcons.forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    const app = e.currentTarget.dataset.app;
+                    
+                    if (app === 'wallpaper') {
+                        showModal('wallpaper-modal');
+                    } else {
+                        showApp(`${app}-app`);
+                    }
+                });
+            });
+            
+            // 返回按钮
+            elements.backButtons.forEach(btn => {
+                btn.addEventListener('click', backToHome);
+            });
+            
+            // 标签页切换
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.dataset.tab);
+                });
+            });
+            
+            // 商店分类切换
+            elements.storeCategories.forEach(category => {
+                category.addEventListener('click', () => {
+                    // 更新激活状态
+                    elements.storeCategories.forEach(c => c.classList.remove('active'));
+                    category.classList.add('active');
+                    
+                    // 过滤商品
+                    renderStoreProducts(category.textContent);
+                });
+            });
+            
+            // 发送消息
+            elements.sendMessageBtn.addEventListener('click', sendMessage);
+            elements.chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            // 打开礼物选择
+            elements.sendGiftBtn.addEventListener('click', () => {
+                showModal('gift-modal');
+            });
+            
+            // 关闭礼物选择
+            elements.closeGiftBtn.addEventListener('click', () => {
+                hideModal('gift-modal');
+            });
+            
+            // 发送礼物
+            elements.sendGiftBtnModal.addEventListener('click', () => {
+                hideModal('gift-modal');
+                alert('礼物已赠送！好感度+5');
+                
+                if (appData.currentChat) {
+                    appData.currentChat.favor += 5;
+                    renderChatList();
+                }
+            });
+            
+            // 打开AI菜单
+            elements.elMenu.addEventListener('click', () => {
+                showModal('ai-menu-modal');
+            });
+            
+            elements.chatMenu.addEventListener('click', () => {
+                showModal('ai-menu-modal');
+            });
+            
+            // 关闭AI菜单
+            elements.closeMenuBtn.addEventListener('click', () => {
+                hideModal('ai-menu-modal');
+            });
+            
+            // API设置
+            elements.apiOption.addEventListener('click', () => {
+                hideModal('ai-menu-modal');
+                showModal('api-modal');
+            });
+            
+            // 关闭API设置
+            elements.closeApiBtn.addEventListener('click', () => {
+                hideModal('api-modal');
+            });
+            
+            // 保存API设置
+            elements.saveApiBtn.addEventListener('click', () => {
+                hideModal('api-modal');
+                alert('API设置已保存');
+            });
+            
+            // 拉黑
+            elements.blockOption.addEventListener('click', () => {
+                hideModal('ai-menu-modal');
+                if (confirm('确定要拉黑此AI吗？')) {
+                    alert('AI已拉黑');
+                }
+            });
+            
+            // 删除好友
+            elements.deleteOption.addEventListener('click', () => {
+                hideModal('ai-menu-modal');
+                if (confirm('确定要删除此好友吗？')) {
+                    alert('好友已删除');
+                }
+            });
+            
+            // 壁纸设置
+            elements.closeWallpaperBtn.addEventListener('click', () => {
+                hideModal('wallpaper-modal');
+            });
+            
+            elements.saveWallpaperBtn.addEventListener('click', () => {
+                const selectedWallpaper = document.querySelector('.photo-item[data-wallpaper].selected');
+                if (selectedWallpaper) {
+                    const wallpaperIndex = parseInt(selectedWallpaper.dataset.wallpaper.replace('gradient', '')) - 1;
+                    appData.currentWallpaper = wallpaperIndex;
+                    elements.homeScreen.style.background = appData.wallpapers[wallpaperIndex];
+                    hideModal('wallpaper-modal');
+                    alert('壁纸已更换');
+                }
+            });
+            
+            // 壁纸选择
+            document.querySelectorAll('.photo-item[data-wallpaper]').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.photo-item[data-wallpaper]').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+            });
+            
+            // 发送图片
+            elements.sendImageBtn.addEventListener('click', () => {
+                alert('每日只能发送3次图片，今天还可以发送3次');
+            });
+            
+            // 短信发送
+            document.querySelector('.sms-send-btn').addEventListener('click', () => {
+                const input = document.querySelector('.sms-input');
+                const message = input.value.trim();
+                if (message) {
+                    alert(`短信已发送: ${message}`);
+                    input.value = '';
+                }
+            });
+            
+            // 添加好友
+            document.querySelectorAll('.ai-action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const card = e.currentTarget.closest('.ai-card');
+                    const name = card.querySelector('.ai-name').textContent;
+                    
+                    // 检查是否已添加
+                    if (appData.chats.some(chat => chat.name === name)) {
+                        alert(`${name} 已经是您的好友了`);
+                    } else {
+                        // 添加到聊天列表
+                        const newChat = {
+                            id: appData.chats.length + 1,
+                            name: name,
+                            avatar: name.charAt(0),
+                            favor: 10,
+                            lastMessage: '我们已经是好友了，开始聊天吧！',
+                            lastTime: '刚刚',
+                            messages: [
+                                {sender: 'ai', text: '你好！我们已经是好友了，开始聊天吧！', time: '刚刚'}
+                            ]
+                        };
+                        
+                        appData.chats.push(newChat);
+                        renderChatList();
+                        
+                        alert(`已向 ${name} 发送好友请求`);
+                        e.currentTarget.textContent = '已发送';
+                        e.currentTarget.disabled = true;
+                        e.currentTarget.style.backgroundColor = '#6C757D';
+                    }
+                });
+            });
+            
+            // 朋友圈互动
+            document.querySelectorAll('.moment-action').forEach(action => {
+                action.addEventListener('click', () => {
+                    const icon = action.querySelector('i');
+                    const countSpan = action.querySelector('span');
+                    
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        icon.style.color = '#FF6B9D';
+                        
+                        let count = parseInt(countSpan.textContent);
+                        countSpan.textContent = count + 1;
+                        
+                        // 添加动画效果
+                        action.style.transform = 'scale(1.2)';
+                        setTimeout(() => {
+                            action.style.transform = 'scale(1)';
+                        }, 300);
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        icon.style.color = '';
+                        
+                        let count = parseInt(countSpan.textContent);
+                        countSpan.textContent = count - 1;
+                    }
+                });
+            });
+            
+            // 创建AI按钮
+            const createAIBtn = document.querySelector('#create-ai-tab .ai-action-btn');
+            if (createAIBtn) {
+                createAIBtn.addEventListener('click', () => {
+                    alert('AI创建成功！');
+                    switchTab('chat');
+                });
+            }
+        }
+
+        // 长按壁纸设置
+        function setupLongPressWallpaper() {
+            let pressTimer;
+            
+            elements.homeScreen.addEventListener('mousedown', (e) => {
+                // 确保点击的是空白区域，而不是应用图标
+                if (e.target === elements.homeScreen || e.target.classList.contains('wallpaper-hint')) {
+                    pressTimer = setTimeout(() => {
+                        showModal('wallpaper-modal');
+                    }, 1000); // 1秒长按
+                }
+            });
+            
+            elements.homeScreen.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+            });
+            
+            elements.homeScreen.addEventListener('mouseleave', () => {
+                clearTimeout(pressTimer);
+            });
+            
+            // 触摸设备支持
+            elements.homeScreen.addEventListener('touchstart', (e) => {
+                if (e.target === elements.homeScreen || e.target.classList.contains('wallpaper-hint')) {
+                    pressTimer = setTimeout(() => {
+                        showModal('wallpaper-modal');
+                    }, 1000);
+                }
+            });
+            
+            elements.homeScreen.addEventListener('touchend', () => {
+                clearTimeout(pressTimer);
+            });
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('fade-in');
+            }
+        }
+
+        // 隐藏模态框
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('fade-in');
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
