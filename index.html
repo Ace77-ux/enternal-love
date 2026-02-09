@@ -123,6 +123,32 @@ min-height: 30px;
         }
 
         /* 壁纸设置提示 */
+        <!-- 壁纸控制按钮 -->
+<div class="wallpaper-controls">
+    <button id="resetWallpaper" class="btn btn-secondary">恢复默认</button>
+    <label for="wallpaperUpload" class="btn btn-primary">
+        <span>选择壁纸</span>
+        <input type="file" id="wallpaperUpload" accept="image/*" style="display: none;">
+    </label>
+</div>
+
+<!-- 原来的壁纸设置提示 -->
+<div class="wallpaper-hint">
+    <div class="hint-content">
+        <span>支持 JPG、PNG、WebP 格式图片</span>
+        <div class="quality-options" style="margin-top: 8px;">
+            <label>
+                <input type="radio" name="quality" value="high" checked> 高质量
+            </label>
+            <label style="margin-left: 10px;">
+                <input type="radio" name="quality" value="balanced"> 平衡
+            </label>
+            <label style="margin-left: 10px;">
+                <input type="radio" name="quality" value="low"> 节省流量
+            </label>
+        </div>
+    </div>
+</div>1
         .wallpaper-hint {
             position: absolute;
             bottom: 20px;
@@ -138,19 +164,80 @@ min-height: 30px;
         }
 
         /* 应用页面容器 */
-        .app-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            border-radius: 40px;
-            overflow: hidden;
-        }
+.app-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    border-radius: 40px;
+    overflow: hidden;
+}
+
+
+/* 壁纸控制按钮 */
+.wallpaper-controls {
+    position: absolute;
+    bottom: 80px;  /* 在提示上方 */
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 0 20px;
+    z-index: 10;
+}
+
+/* 按钮基本样式 */
+.wallpaper-controls .btn {
+    padding: 10px 20px;
+    margin: 0 8px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* 蓝色按钮（选择壁纸） */
+.btn-primary {
+    background-color: #007AFF;
+    color: white;
+}
+
+/* 灰色按钮（恢复默认） */
+.btn-secondary {
+    background-color: #8E8E93;
+    color: white;
+}
+
+/* 更新壁纸提示的样式 */
+.wallpaper-hint {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 让提示内容垂直排列 */
+.hint-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 质量选项的样式 */
+.quality-options {
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+.quality-options label {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
 
         /* 应用头部 */
         .app-header {
@@ -2155,5 +2242,63 @@ min-height: 30px;
         // 初始化应用
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script>
+// 等页面完全加载后执行
+window.addEventListener('load', function() {
+    
+    // 获取需要的元素
+    const uploadInput = document.getElementById('wallpaperUpload');
+    const resetButton = document.getElementById('resetWallpaper');
+    
+    // 如果用户选择了文件
+    uploadInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // 检查是不是图片
+        if (!file.type.startsWith('image/')) {
+            alert('请选择图片文件（JPG、PNG等）');
+            return;
+        }
+        
+        // 创建图片预览
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // 设置壁纸
+            document.body.style.backgroundImage = `url('${e.target.result}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            
+            // 保存到本地存储
+            localStorage.setItem('customWallpaper', e.target.result);
+            
+            // 显示提示
+            alert('壁纸设置成功！');
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // 恢复默认按钮
+    resetButton.addEventListener('click', function() {
+        // 清除本地存储的壁纸
+        localStorage.removeItem('customWallpaper');
+        
+        // 恢复原来的背景（这里需要你自己设置）
+        document.body.style.backgroundImage = ''; // 清空背景
+        // 或者设置回原来的背景色/背景图
+        
+        alert('已恢复默认壁纸');
+    });
+    
+    // 页面加载时检查是否有保存的壁纸
+    const savedWallpaper = localStorage.getItem('customWallpaper');
+    if (savedWallpaper) {
+        document.body.style.backgroundImage = `url('${savedWallpaper}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+    }
+    
+});
+</script>
 </body>
 </html>
